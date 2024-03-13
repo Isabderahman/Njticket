@@ -40,7 +40,7 @@ class etatController extends Controller
             $result = Etat::create($request->all());
             if ($result) {
                 return response()->json(["message" => " $request->type_etat est ajouter"]);
-            } else {
+            }else {
                 return response()->json(["message" => "somethings wrong"]);
             }
         }
@@ -78,7 +78,7 @@ class etatController extends Controller
         try {
             $etat->update($request->all());
 
-            return response()->json(['message' => 'Categorie updated successfully'], 200);
+            return response()->json(['message' => 'Etat updated successfully'], 200);
         } catch (QueryException $e) {
             return response()->json([
                 'message' => 'Something went wrong', 
@@ -95,7 +95,7 @@ class etatController extends Controller
         $etat = Etat::find($id);
         $resultat = $etat->delete();
         if ($resultat) {
-            return response()->json(["message" => "l'etat $id est supprimer"]);
+            return response()->json(["message" => "l'état $id est supprimer"]);
         } else {
             return response()->json(["message" => "somethings wrong"]);
         }

@@ -8,4 +8,5 @@ use Illuminate\Database\Eloquent\Model;
 class Priorite extends Model
 {
     use HasFactory;
+    protected $fillable = ['id', 'type_priorite', 'created_at', 'updated_at'];
 }
