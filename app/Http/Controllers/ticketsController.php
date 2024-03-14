@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\storeTicketRequest;
-use App\Http\Requests\updateTicketRequest;
+use App\Http\Requests\StoreTicketRequest;
+use App\Http\Requests\UpdateTicketRequest;
 use App\Models\Categorie;
 use App\Models\Etat;
 use App\Models\Historique;
@@ -12,11 +12,18 @@ use App\Models\Projet;
 use App\Models\Ticket;
 use Illuminate\Http\Request;
 
-class ticketsController extends Controller
+class TicketsController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
+    public function __construct()
+    {
+        $this->middleware('IsAdmin');
+        // $this->middleware('auth:sanctum');
+        $this->middleware('IsClient')->only('store','show');
+        $this->middleware('isRealisateur')->only('update');
+    }
     public function index()
     {
         return Ticket::all();
@@ -33,7 +40,7 @@ class ticketsController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(storeTicketRequest $request)
+    public function store(StoreTicketRequest $request)
     {
         $existProjetId = Projet::find($request->projet_id);
         $exisCategorieId = Categorie::find($request->categorie_id);
@@ -63,7 +70,7 @@ class ticketsController extends Controller
     public function show(string $id)
     {
         //
-        $ticket = Ticket::find($id);
+        $ticket = Ticket::find((int)$id);
         if ($ticket) {
             return $ticket;
         } else {
@@ -82,7 +89,7 @@ class ticketsController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(updateTicketRequest $request, Ticket $ticket, Historique $historique)
+    public function update(UpdateTicketRequest $request, Ticket $ticket, Historique $historique)
     {
 
         if ($ticket->update([

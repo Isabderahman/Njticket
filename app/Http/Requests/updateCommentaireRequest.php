@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class updateCommentaireRequest extends FormRequest
+class UpdateCommentaireRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,11 +23,11 @@ class updateCommentaireRequest extends FormRequest
     {
         $method= $this->method();
         if($method=='PUT'){
-            return [
-                'contenu'=>'required',
-                'commentateur_id'=>'required',
-                'ticket_id'=>'required',
-            ];
+            return[
+            'contenu'=>'required',
+            'commentateur_id'=>'required',
+            'ticket_id'=>'required',
+        ];
         }else{
             return [
                 'contenu'=>'sometimes|required',

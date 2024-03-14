@@ -2,19 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\storeClientRequest;
-use App\Http\Requests\updateClientRequest;
+use App\Http\Requests\StoreClientRequest;
+use App\Http\Requests\UpdateClientRequest;
 use App\Models\Client;
 use App\Models\Projet;
 use App\Models\User;
 use Illuminate\Http\Request;
 
-class clientController extends Controller
+class ClientController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth');
-        $this->middleware('isAdmin');
+        $this->middleware('Auth');
+        $this->middleware('IsAdmin')->only('index','dstroy');
     }
     /**
      * Display a listing of the resource.
@@ -36,7 +36,7 @@ class clientController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(storeClientRequest $request)
+    public function store(StoreClientRequest $request)
     {
         //
         $existProjetId = Projet::find($request->projet_id);
@@ -50,8 +50,9 @@ class clientController extends Controller
                 "prenom" => $request->prenom,
                 "email" => $request->email,
                 "password" => $request->password,
+                "type_user"=> 2
             ]);
-            $UserID = User::find($request->user_id);
+            $UserID = User::find($request->email);
             $result = Client::create([
                 "profile" => $request->profile,
                 "entreprise" => $request->entreprise,
@@ -91,7 +92,7 @@ class clientController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(updateClientRequest $request, Client $client)
+    public function update(UpdateClientRequest $request, Client $client)
     {
         if ($client->update($request->all())) {
             return response()->json(['message' => 'le client updated successfully']);

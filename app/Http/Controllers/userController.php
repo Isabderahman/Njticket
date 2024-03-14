@@ -2,16 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\storeUsersRequest;
-use App\Http\Requests\updateUsersRequest;
+use App\Http\Requests\StoreUsersRequest;
+use App\Http\Requests\UpdateUsersRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 
-class userController extends Controller
+class UserController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    public function __construct()
+    {
+        $this->middleware('IsAdmin');
+        $this->middleware('IsClient')->only('store');
+    }
+    
     public function index()
     {
         //
@@ -29,7 +32,7 @@ class userController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(storeUsersRequest $request)
+    public function store(StoreUsersRequest $request)
     {
         //
         $existingUser = User::where('email', $request->email)->first();
@@ -77,7 +80,7 @@ class userController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(updateUsersRequest $request, User $user)
+    public function update(UpdateUsersRequest $request, User $user)
     {
         if ($user->update($request->all())) {
             return response()->json(['message' => 'Project updated successfully']);

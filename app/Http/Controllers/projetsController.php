@@ -7,11 +7,16 @@ use App\Http\Requests\updateProjetRequest;
 use App\Models\Projet;
 use Illuminate\Http\Request;
 
-class projetsController extends Controller
+class ProjetsController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
+    public function __construct()
+    {
+        $this->middleware('IsAdmin');
+        $this->middleware('Client')->only('show');
+    }
     public function index()
     {
         //
@@ -29,7 +34,7 @@ class projetsController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(storeProjetRequest $request)
+    public function store(StoreProjetRequest $request)
     {
         //
         $existingProject = Projet::where('nom_projet', $request->nom_projet)->first();
@@ -71,7 +76,7 @@ class projetsController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(updateProjetRequest $request, Projet $projet)
+    public function update(UpdateProjetRequest $request , Projet $projet)
     {
         //
         if ($projet->update($request->all())) {

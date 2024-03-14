@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 class isClient
@@ -17,10 +18,11 @@ class isClient
     {
         $user = auth()->user();
 
-    if ($user && $user->type_user == 2) {
-        return $next($request);
-    } else {
-        abort(403);
-    }
+        if (Auth::guard('sanctum')->check()) {
+            if (Auth::guard('sanctum')->user()->type_user ==2) {
+                return $next($request);
+            }
+        }
+        return response()->json(['error' => 'Unauthorized.'], 401);
     }
 }

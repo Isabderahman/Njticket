@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\storeCategorieRequest;
-use App\Http\Requests\updateCategorieRequest;
+use App\Http\Requests\StoreCategorieRequest;
+use App\Http\Requests\UpdateCategorieRequest;
 use App\Models\Categorie;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
@@ -13,6 +13,10 @@ class CategoriesController extends Controller
     /**
      * Display a listing of the resource.
      */
+    public function __construct()
+    {
+        $this->middleware('IsAdmin');
+    }
     public function index()
     {
         //
@@ -30,7 +34,7 @@ class CategoriesController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(storeCategorieRequest $request)
+    public function store(StoreCategorieRequest $request)
     {
         //
         $existingCategorie = Categorie::where('type_categorie', $request->type_categorie)->first();
@@ -73,7 +77,7 @@ class CategoriesController extends Controller
      */
 
 
-    public function update(Request $request, Categorie $categorie)
+    public function update(UpdateCategorieRequest $request, Categorie $categorie)
     {
         try {
             $categorie->update($request->all());

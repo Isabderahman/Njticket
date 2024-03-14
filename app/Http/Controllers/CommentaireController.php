@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\storeCommentaireRequest;
-use App\Http\Requests\updateCommentaireRequest;
+use App\Http\Requests\StoreCommentaireRequest;
+use App\Http\Requests\UpdateCommentaireRequest;
 use App\Models\Commentaire;
 use Illuminate\Http\Request;
 
@@ -12,9 +12,12 @@ class CommentaireController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function __construct()
     {
-        
+        $this->middleware('Auth');
+    }
+    public function index()
+    {       
         return Commentaire::all();
     }
 
@@ -30,7 +33,7 @@ class CommentaireController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(storeCommentaireRequest $request)
+    public function store(StoreCommentaireRequest $request)
     {
         $result = Commentaire::create($request->all());
             if ($result) {
@@ -60,7 +63,7 @@ class CommentaireController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(updateCommentaireRequest $request, Commentaire $commentaire)
+    public function update(UpdateCommentaireRequest $request, Commentaire $commentaire)
     {
         //
         if ($commentaire->update($request->all())) {

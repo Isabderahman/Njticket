@@ -2,17 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\storePrioriteRequest;
-use App\Http\Requests\updatePrioriteRequest;
+use App\Http\Requests\StorePrioriteRequest;
+use App\Http\Requests\UpdatePrioriteRequest;
 use App\Models\Priorite;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 
-class prioriteController extends Controller
+class PrioriteController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
+    public function __construct()
+    {
+        $this->middleware('IsAdmin');
+    }
     public function index()
     {
         //
@@ -30,7 +34,7 @@ class prioriteController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(storePrioriteRequest $request)
+    public function store(StorePrioriteRequest $request)
     {
         $existingPriorite = Priorite::where('type_priorite', $request->type_priorite)->first();
         if ($existingPriorite) {
@@ -69,7 +73,7 @@ class prioriteController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(updatePrioriteRequest $request, Priorite $priorite)
+    public function update(UpdatePrioriteRequest $request, Priorite $priorite)
     {
         try {
             $priorite->update($request->all());

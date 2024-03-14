@@ -2,17 +2,22 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\storeEtatRequest;
-use App\Http\Requests\updateEtatRequest;
+use App\Http\Requests\StoreEtatRequest;
+use App\Http\Requests\UpdateEtatRequest;
 use App\Models\Etat;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 
-class etatController extends Controller
+class EtatController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
+    
+     public function __construct()
+     {
+         $this->middleware('IsAdmin');
+     }
     public function index()
     {
         //
@@ -30,7 +35,7 @@ class etatController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(storeEtatRequest $request)
+    public function store(StoreEtatRequest $request)
     {
         //
         $existingEtat = Etat::where('type_etat', $request->type_etat)->first();
@@ -72,7 +77,7 @@ class etatController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(updateEtatRequest $request,  Etat $etat)
+    public function update(UpdateEtatRequest $request,  Etat $etat)
     {
         //
         try {
