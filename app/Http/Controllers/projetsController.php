@@ -6,6 +6,7 @@ use App\Http\Requests\storeProjetRequest;
 use App\Http\Requests\updateProjetRequest;
 use App\Models\Projet;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ProjetsController extends Controller
 {
@@ -14,8 +15,15 @@ class ProjetsController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('IsAdmin');
-        $this->middleware('Client')->only('show');
+        $userType = Auth::guard('sanctum')->user()->type_user;
+
+        if ($userType == 1) {
+            $this->middleware('IsAdmin');
+        } elseif ($userType == 2) {
+            $this->middleware('IsClient')->only('store', 'show');
+        }      
+        // $this->middleware('IsAdmin');
+        // $this->middleware('Client')->only('show');
     }
     public function index()
     {

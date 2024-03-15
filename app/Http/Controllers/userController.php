@@ -6,13 +6,22 @@ use App\Http\Requests\StoreUsersRequest;
 use App\Http\Requests\UpdateUsersRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('IsAdmin');
-        $this->middleware('IsClient')->only('store');
+        $userType = Auth::guard('sanctum')->user()->type_user;
+
+        if ($userType == 1) {
+            $this->middleware('IsAdmin');
+        } elseif ($userType == 2) {
+            $this->middleware('IsClient')->only('store', 'show');
+        }
+
+        // $this->middleware('IsAdmin');
+        // $this->middleware('IsClient')->only('store');
     }
     
     public function index()

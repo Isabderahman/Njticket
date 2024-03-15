@@ -11,6 +11,7 @@ use App\Models\Priorite;
 use App\Models\Projet;
 use App\Models\Ticket;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class TicketsController extends Controller
 {
@@ -19,10 +20,16 @@ class TicketsController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('IsAdmin');
-        // $this->middleware('auth:sanctum');
-        $this->middleware('IsClient')->only('store','show');
-        $this->middleware('isRealisateur')->only('update');
+        $userType = Auth::guard('sanctum')->user()->type_user;
+
+        if ($userType == 1) {
+            $this->middleware('IsAdmin');
+        } elseif ($userType == 3) {
+            $this->middleware('IsRealisateur')->only('update');
+        } else {
+            $this->middleware('IsClient')->only('store', 'show');
+        }
+        
     }
     public function index()
     {
@@ -93,18 +100,18 @@ class TicketsController extends Controller
     {
 
         if ($ticket->update([
-            'id'=>$request->id,
-            'titre_ticket'=>$request->titre_ticket,
-            'contenu'=>$request->contenu,
-            'date_estime'=>$request->date_estime,
-            'date_realisation'=>$request->date_realisation,
-            'projet_id'=>$request->projet_id,
-            'categorie_id'=>$request->categorie_id,
-            'priorite_id'=>$request->priorite_id,
-            'created_at'=>$request->created_at,
-            'updated_at'=>$request->updated_at,
-            'realisateur_id'=>$request->realisateur_id,
-            'type_ticket'=>$request->type_ticket
+            'id' => $request->id,
+            'titre_ticket' => $request->titre_ticket,
+            'contenu' => $request->contenu,
+            'date_estime' => $request->date_estime,
+            'date_realisation' => $request->date_realisation,
+            'projet_id' => $request->projet_id,
+            'categorie_id' => $request->categorie_id,
+            'priorite_id' => $request->priorite_id,
+            'created_at' => $request->created_at,
+            'updated_at' => $request->updated_at,
+            'realisateur_id' => $request->realisateur_id,
+            'type_ticket' => $request->type_ticket
         ])) {
             $historique->create([
                 "description_modification" => $request->description_modification,

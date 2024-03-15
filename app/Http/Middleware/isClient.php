@@ -16,10 +16,8 @@ class isClient
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $user = auth()->user();
-
-        if (Auth::guard('sanctum')->check()) {
-            if (Auth::guard('sanctum')->user()->type_user ==2) {
+        if (Auth::guard('sanctum')->check()) {   
+            if (Auth::guard('sanctum')->user()->type_user == 2) {
                 return $next($request);
             }
         }
