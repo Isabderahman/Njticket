@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('tickets', function (Blueprint $table) {
             //
-            $table->string('piece jointe')->nullable();
+            $table->string('piece_jointe')->nullable();
         });
     }
 
@@ -24,7 +24,7 @@ return new class extends Migration
     {
         Schema::table('tickets', function (Blueprint $table) {
             //
-            $table->dropColumn('piece jointe');
+            $table->dropColumn('piece_jointe');
 
         });
     }
