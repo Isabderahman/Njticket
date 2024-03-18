@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreTicketRequest;
 use App\Http\Requests\UpdateTicketRequest;
 use App\Models\Categorie;
+use App\Models\Client;
 use App\Models\Etat;
 use App\Models\Historique;
 use App\Models\Priorite;
@@ -29,11 +30,29 @@ class TicketsController extends Controller
         } else {
             $this->middleware('IsClient')->only('store', 'show');
         }
-        
     }
     public function index()
     {
-        return Ticket::all();
+        $userID = Auth::guard('sanctum')->user()->id;
+        $userType = Auth::guard('sanctum')->user()->type_user;
+        if ($userType == 1 || $userType == 4) {
+            return Ticket::all();
+        } elseif ($userType == 2) {
+            $projets = Client::where('user_id', $userID)->pluck('projet_id')->toArray();
+            $tickets = Ticket::whereIn('projet_id', $projets)->get();
+            if ($tickets) {
+                return $tickets;
+            } else {
+                return ["erreur" => "Vous n'avez pas l'accès à ce ticket"];
+            }
+        } else {
+            $ticket = Ticket::where('realisateur_id', $userID)->get();
+            if ($ticket) {
+                return $ticket;
+            } else {
+                return ["erreur" => "vous n'avez pas l'accés a ce ticket"];
+            }
+        }
     }
 
     /**
@@ -63,17 +82,17 @@ class TicketsController extends Controller
             return response()->json(['message' => 'EtatId ID est incorrect']);
         } else {
             if ($request->hasFile('image')) {
-                $imageName = time().'.'.$request->image->extension();  
+                $imageName = time() . '.' . $request->image->extension();
                 $request->image->move(public_path('images'), $imageName);
             } else {
                 $imageName = null;
             }
-    
+
             $ticket = new Ticket;
             $ticket->fill($request->all());
-            $ticket->piece_jointe = 'images/'.$imageName;
+            $ticket->piece_jointe = 'images/' . $imageName;
             $ticket->save();
-    
+
             return response()->json(["message" => "Le ticket {$ticket->id} a été ajouté avec succès"], 201);
         }
     }
@@ -84,12 +103,40 @@ class TicketsController extends Controller
     public function show(string $id)
     {
         //
-        $ticket = Ticket::find((int)$id);
-        if ($ticket) {
-            return $ticket;
+        $userID = Auth::guard('sanctum')->user()->id;
+        $userType = Auth::guard('sanctum')->user()->type_user;
+        if ($userType == 1 or $userType == 4) {
+            $ticket = Ticket::find((int)$id);
+            if ($ticket)
+                if ($ticket) {
+                    return $ticket;
+                } else {
+                    return ["erreur" => "somethings wrong"];
+                }
+        } elseif ($userType == 2) {
+            $projets = Client::where('user_id', $userID)->pluck('projet_id')->toArray(); // Extract projet_id values and convert to array
+            $accesTicket = Ticket::find((int)$id);
+
+            if (in_array($accesTicket->projet_id, $projets)) {
+                return $accesTicket;
+            } else {
+                return ["erreur" => "Vous n'avez pas l'accès à ce ticket"];
+            }
         } else {
-            return ["ereur" => "somethings wrong"];
-        };
+            $ticket = Ticket::where("id", (int)$id)->where('realisateur_id', $userID)->get();
+            if ($ticket) {
+                return $ticket;
+            } else {
+                return ["erreur" => "vous n'avez pas l'accés a ce ticket"];
+            }
+        }
+        // $ticket = Ticket::find((int)$id);
+        // if($ticket)
+        // if ($ticket) {
+        //     return $ticket;
+        // } else {
+        //     return ["ereur" => "somethings wrong"];
+        // };
     }
 
     /**
