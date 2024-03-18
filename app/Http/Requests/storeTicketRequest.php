@@ -29,7 +29,7 @@ class StoreTicketRequest extends FormRequest
             'priorite_id' => 'required',
             'etat_id' => 'required',
             'type_ticket' => 'required',
-            'realisateur_id' => 'required',
+            // 'realisateur_id' => 'required',
         ];
     }
 }

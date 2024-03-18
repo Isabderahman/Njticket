@@ -31,7 +31,7 @@ class UpdateTicketRequest extends FormRequest
                 'priorite_id'=>'required',
                 'etat_id'=>'required',
                 'type_ticket'=>'required',
-                'realisateur_id'=>'required',
+                // 'realisateur_id'=>'required',
                 'modificateur_id'=>'required',
                 'description_modification'=>'required'
             ];
