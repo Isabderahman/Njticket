@@ -21,11 +21,11 @@ class TicketsController extends Controller
      */
     public function __construct()
     {
-        $userType = Auth::guard('sanctum')->user()->type_user;
-
-        if ($userType == 1) {
+        $user = Auth::guard('sanctum')->user();
+        
+        if ($user && $user->type_user == 1) {
             $this->middleware('IsAdmin');
-        } elseif ($userType == 3) {
+        } elseif ($user && $user->type_user == 3) {
             $this->middleware('IsRealisateur')->only('update');
         } else {
             $this->middleware('IsClient')->only('store', 'show');

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\storeProjetRequest;
 use App\Http\Requests\updateProjetRequest;
+use App\Models\Client;
 use App\Models\Projet;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,12 +16,11 @@ class ProjetsController extends Controller
      */
     public function __construct()
     {
-        $userType = Auth::guard('sanctum')->user()->type_user;
-
-        if ($userType == 1) {
+        $user = Auth::guard('sanctum')->user();
+        if ($user && $user->type_user == 1) {
             $this->middleware('IsAdmin');
-        } elseif ($userType == 2) {
-            $this->middleware('IsClient')->only('store', 'show');
+        } elseif ($user && $user->type_user == 2) {
+            $this->middleware('IsClient')->only('store', 'show','index');
         }      
         // $this->middleware('IsAdmin');
         // $this->middleware('Client')->only('show');
@@ -28,7 +28,15 @@ class ProjetsController extends Controller
     public function index()
     {
         //
-        return Projet::all();
+        $user = Auth::guard('sanctum')->user();
+        if ($user && ($user->type_user == 1 || $user->type_user == 3 || $user->type_user == 4)){
+            return Projet::all();
+        }else{
+            $userID = Auth::guard('sanctum')->user()->user_id;
+            $projets = Client::where('user_id', $userID)->pluck('projet_id')->toArray();
+            $listProjet = Projet::whereIn('id', $projets)->get();
+            return $listProjet;
+        }
     }
 
     /**

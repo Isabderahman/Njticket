@@ -14,11 +14,11 @@ class ClientController extends Controller
 {
     public function __construct()
     {
-        $userType = Auth::guard('sanctum')->user()->type_user;
+        $user= Auth::guard('sanctum')->user();
 
-        if ($userType == 1) {
+        if ($user && $user->type_user == 1) {
             $this->middleware('IsAdmin');
-        } elseif ($userType == 2) {
+        } elseif ($user && $user->type_user == 2) {
             $this->middleware('IsClient')->except('destroy');
         }
     }
