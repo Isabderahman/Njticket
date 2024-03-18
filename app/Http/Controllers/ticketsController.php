@@ -62,12 +62,19 @@ class TicketsController extends Controller
         } elseif ($existEtatId == null) {
             return response()->json(['message' => 'EtatId ID est incorrect']);
         } else {
-            $result = Ticket::create($request->all());
-            if ($result) {
-                return response()->json(["message" => "le ticket $request->id est ajouter"]);
+            if ($request->hasFile('image')) {
+                $imageName = time().'.'.$request->image->extension();  
+                $request->image->move(public_path('images'), $imageName);
             } else {
-                return response()->json(["message" => "somethings wrong"]);
+                $imageName = null;
             }
+    
+            $ticket = new Ticket;
+            $ticket->fill($request->all());
+            $ticket->piece_jointe = 'images/'.$imageName;
+            $ticket->save();
+    
+            return response()->json(["message" => "Le ticket {$ticket->id} a été ajouté avec succès"], 201);
         }
     }
 
