@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string("profile");
             $table->string("entreprise");
             $table->foreignId('projet_id')->references('id')->on('projets');
-            $table->foreignId('user_id')->references('id')->on('users');
+            $table->foreignId('user_id')->references('id')->on('users')->unique();
             $table->timestamps();
         });
     }

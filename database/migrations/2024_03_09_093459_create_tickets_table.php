@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             $table->string('titre_ticket');
             $table->string('contenu');
-            $table->string('type_ticket');
             $table->dateTime('date_estime');
             $table->dateTime('date_realisation');
 
