@@ -32,7 +32,7 @@ class UpdateTicketRequest extends FormRequest
                 'etat_id'=>'required',
                 'type_ticket'=>'required',
                 // 'realisateur_id'=>'required',
-                'modificateur_id'=>'required',
+                // 'modificateur_id'=>'required',
                 'description_modification'=>'required'
             ];
         }else{
@@ -44,7 +44,7 @@ class UpdateTicketRequest extends FormRequest
                 'categorie_id'=>'sometimes|required',
                 'priorite_id'=>'sometimes|required',
                 'etat_id'=>'sometimes|required',
-                'modificateur_id'=>'required',
+                // 'modificateur_id'=>'required',
                 'description_modification'=>'required'
             ];
         }

@@ -26,7 +26,7 @@ class StoreTicketRequest extends FormRequest
             'contenu' => 'required',
             'projet_id' => 'required',
             'categorie_id' => 'required',
-            'priorite_id' => 'required',
+            'priorite_id' => 'sometimes|required',
             'etat_id' => 'required',
             'type_ticket' => 'required',
             // 'realisateur_id' => 'required',

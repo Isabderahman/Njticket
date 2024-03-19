@@ -14,12 +14,12 @@ class ClientController extends Controller
 {
     public function __construct()
     {
-        $user= Auth::guard('sanctum')->user();
+        $user = Auth::guard('sanctum')->user();
 
         if ($user && $user->type_user == 1) {
             $this->middleware('IsAdmin');
         } elseif ($user && $user->type_user == 2) {
-            $this->middleware('IsClient')->except('destroy');
+            $this->middleware('IsClient')->except('destroy', 'index');
         }
     }
     /**
@@ -89,14 +89,21 @@ class ClientController extends Controller
      */
     public function show(string $id)
     {
-        //
+        // Vérifier si le client existe
         $client = Client::find($id);
-        if ($client) {
-            return $client;
-        } else {
-            return response()->json(["message" => "le client $id n'est exicit pas"]);
+        if (!$client) {
+            return response()->json(["message" => "Le client $id n'existe pas"], 404);
         }
-    }
+    
+        // Vérifier les autorisations de l'utilisateur
+        $userId = Auth::guard('sanctum')->user();
+        if ($userId->type_user == 2 && $client->user_id !== $userId->id) {
+            return response()->json(["message" => "Vous n'avez pas accès à ce client"], 403);
+        }
+    
+        // Retourner les détails du client
+        return $client;
+    }    
 
     /**
      * Show the form for editing the specified resource.
@@ -109,13 +116,26 @@ class ClientController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateClientRequest $request, Client $client)
+    public function update(UpdateClientRequest $request, Client $client, string $id)
     {
+        // Vérifier si le client existe
+        $client = Client::find($id);
+        if (!$client) {
+            return response()->json(["message" => "Le client $id n'existe pas"], 404);
+        }
+    
+        // Vérifier les autorisations de l'utilisateur
+        $userId = Auth::guard('sanctum')->user();
+        if ($userId->type_user == 2 && $client->user_id !== $userId->id) {
+            return response()->json(["message" => "Vous n'êtes pas autorisé à mettre à jour ce client"], 403);
+        }
+    
+        // Effectuer la mise à jour du client
         if ($client->update($request->all())) {
-            return response()->json(['message' => 'le client updated successfully']);
+            return response()->json(['message' => 'Le client a été mis à jour avec succès']);
         } else {
-            return response()->json(['message' => 'somethings wrong']);
-        };
+            return response()->json(['message' => 'Une erreur s\'est produite lors de la mise à jour du client'], 500);
+        }
     }
 
     /**

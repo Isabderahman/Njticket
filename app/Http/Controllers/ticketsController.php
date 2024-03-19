@@ -22,13 +22,13 @@ class TicketsController extends Controller
     public function __construct()
     {
         $user = Auth::guard('sanctum')->user();
-        
+
         if ($user && $user->type_user == 1) {
             $this->middleware('IsAdmin');
         } elseif ($user && $user->type_user == 3) {
-            $this->middleware('IsRealisateur')->only('update');
+            $this->middleware('IsRealisateur')->except('destroy');
         } else {
-            $this->middleware('IsClient')->only('store', 'show');
+            $this->middleware('IsClient')->except('destroy');
         }
     }
     public function index()
@@ -150,32 +150,70 @@ class TicketsController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateTicketRequest $request, Ticket $ticket, Historique $historique)
+    public function update(UpdateTicketRequest $request, Ticket $ticket, Historique $historique, string $id)
     {
-
-        if ($ticket->update([
-            'id' => $request->id,
-            'titre_ticket' => $request->titre_ticket,
-            'contenu' => $request->contenu,
-            'date_estime' => $request->date_estime,
-            'date_realisation' => $request->date_realisation,
-            'projet_id' => $request->projet_id,
-            'categorie_id' => $request->categorie_id,
-            'priorite_id' => $request->priorite_id,
-            'created_at' => $request->created_at,
-            'updated_at' => $request->updated_at,
-            'realisateur_id' => $request->realisateur_id,
-            'type_ticket' => $request->type_ticket
-        ])) {
-            $historique->create([
-                "description_modification" => $request->description_modification,
-                "modificateur_id" => $request->realisateur_id,
-                "ticket_id" => $request->id
-            ]);
-            return response()->json(['message' => ' ticket has updated successfully']);
+        $userID = Auth::guard('sanctum')->user()->id;
+        $userType = Auth::guard('sanctum')->user()->type_user;
+        $ticketTest = Ticket::find($id);
+        if ($ticketTest) {
+            return response()->json(['message' => 'aucun ticket avec ce id']);
+        }
+        if ($userType == 2) {
+            $ticketProjet = Ticket::where('id', $id)->get(['projet_id']);
+            $projetclient = Client::where('projet_id', $ticketProjet)->where('user_id', $userID)->get();
+            if ($projetclient) {
+                $etatTicket = Ticket::find('id', $id);
+                if ($etatTicket->etat_id !== 1) {
+                    return response()->json(['message' =>  "vous n'avez pas l'acces de modifier ce ticket"]);
+                }
+                if ($ticketTest->update([
+                    'id' => $id,
+                    'titre_ticket' => $request->titre_ticket,
+                    'contenu' => $request->contenu,
+                    'projet_id' => $request->projet_id,
+                    'categorie_id' => $request->categorie_id,
+                    'priorite_id' => $request->priorite_id,
+                    'created_at' => $request->created_at,
+                    'updated_at' => $request->updated_at,
+                    'type_ticket' => $request->type_ticket
+                ])) {
+                    $historique->create([
+                        "description_modification" => $request->description_modification,
+                        "modificateur_id" => $userID,
+                        "ticket_id" => $id
+                    ]);
+                    return response()->json(['message' => ' ticket has updated successfully']);
+                } else {
+                    return response()->json(['message' => 'somethings wrong']);
+                };
+            } else {
+                return response()->json(['message' =>  "vous n'avez pas l'acces de modifier ce ticket"]);
+            }
         } else {
-            return response()->json(['message' => 'somethings wrong']);
-        };
+            if ($ticketTest->update([
+                'id' => $id,
+                'titre_ticket' => $request->titre_ticket,
+                'contenu' => $request->contenu,
+                'date_estime' => $request->date_estime,
+                'date_realisation' => $request->date_realisation,
+                'projet_id' => $request->projet_id,
+                'categorie_id' => $request->categorie_id,
+                'priorite_id' => $request->priorite_id,
+                'created_at' => $request->created_at,
+                'updated_at' => $request->updated_at,
+                'realisateur_id' => $request->realisateur_id,
+                'type_ticket' => $request->type_ticket
+            ])) {
+                $historique->create([
+                    "description_modification" => $request->description_modification,
+                    "modificateur_id" => $userID,
+                    "ticket_id" => $id
+                ]);
+                return response()->json(['message' => 'Le ticket a été mis à jour avec succès']);
+            } else {
+                return response()->json(['message' => 'Quelque chose s\'est mal passé lors de la mise à jour du ticket'], 500);
+            }
+        }
     }
 
     /**

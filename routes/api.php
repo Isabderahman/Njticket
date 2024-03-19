@@ -159,8 +159,6 @@ Route::apiResource('tickets',TicketsController::class);
                 'priorite_id'=>'required',
                 'etat_id'=>'required',
                 'type_ticket'=>'required',
-                'realisateur_id'=>'required',
-                'modificateur_id'=>'required',
                 'description_modification'=>'required'
             ]; api/tickets/{id_tickets}
 // PATCH :  body-param : [
@@ -171,7 +169,6 @@ Route::apiResource('tickets',TicketsController::class);
                 'categorie_id'=>'sometimes|required',
                 'priorite_id'=>'sometimes|required',
                 'etat_id'=>'sometimes|required',
-                'modificateur_id'=>'required',
                 'description_modification'=>'required'
             ]; api/tickets/{id_tickets}
 // DELETE : api/tickets/{id_tickets}

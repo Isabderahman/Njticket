@@ -32,7 +32,7 @@ class ProjetsController extends Controller
         if ($user && ($user->type_user == 1 || $user->type_user == 3 || $user->type_user == 4)){
             return Projet::all();
         }else{
-            $userID = Auth::guard('sanctum')->user()->user_id;
+            $userID = Auth::guard('sanctum')->user()->id;
             $projets = Client::where('user_id', $userID)->pluck('projet_id')->toArray();
             $listProjet = Projet::whereIn('id', $projets)->get();
             return $listProjet;
@@ -72,13 +72,26 @@ class ProjetsController extends Controller
     public function show(string $id)
     {
         //
-
-        $projet = Projet::find($id);
-        if ($projet) {
-            return $projet;
-        } else {
-            return response()->json(["ereur" => "non projet avec ce id"]);
+        $user = Auth::guard('sanctum')->user();
+        if ($user && ($user->type_user == 1 || $user->type_user == 3 || $user->type_user == 4)){
+            $projet = Projet::find($id);
+            if ($projet) {
+                return $projet;
+            } else {
+                return response()->json(["ereur" => "non projet avec ce id"]);
+            }
+        }else{
+            $userID = Auth::guard('sanctum')->user()->id;
+            $Clientprojets = Client::where('user_id', $userID)->pluck('projet_id')->toArray();
+            $projet = Projet::whereIn('id', $Clientprojets)->where('id',$id)->get();
+            
+            if(count($projet) != 0){
+                return $projet;
+            }else{
+                return ['erreur',"vous n'avez pas l'accés a ce Projet"];
+            }
         }
+
     }
 
     /**
